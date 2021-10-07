@@ -1,0 +1,62 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "c88093345d0231f73e2fcd236cb77c71",
+    "packages": [
+        {
+            "name": "miome/iso8583",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/m1ome/iso8583.git",
+                "reference": "ee21a35c3d4c737d8c939bd01bc26475850910fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/m1ome/iso8583/zipball/ee21a35c3d4c737d8c939bd01bc26475850910fe",
+                "reference": "ee21a35c3d4c737d8c939bd01bc26475850910fe",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "kahlan/kahlan": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ISO8583\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "w1n2k",
+                    "email": "cryfall@gmail.com"
+                }
+            ],
+            "description": "ISO8583 Pack/Unpack library",
+            "support": {
+                "issues": "https://github.com/m1ome/iso8583/issues",
+                "source": "https://github.com/m1ome/iso8583/tree/master"
+            },
+            "time": "2017-02-28T17:02:18+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.1.0"
+}
