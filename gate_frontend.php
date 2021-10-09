@@ -10,6 +10,11 @@
 
     }?>
     <form action="<?php echo $_SERVER['PHP_SELF'];?>" method = "POST" >
+      <label for="issuer">Issuer</label>
+      <select name="issuer" id="issuer">
+        <option value="Visa">Visa</option><br>
+      </select><br>
+
       <label for="owner">Pembayar</label><br>
       <input type="text" id="username" name="username" required>
       <br><br>

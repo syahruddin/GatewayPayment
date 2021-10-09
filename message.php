@@ -4,7 +4,7 @@
     $bank_Config = json_decode($bank_Config);
     $RRN = createRRN($STAN);
     $data = json_decode($formMessage);
-    $currentBank = $bank_Config->Bank->($data->bank)
+    $currentBank = $bank_Config->Bank->($data->issuer);
 
     $message = new Message(new Protocol(),['lengthPrefix' => 0]);
     $message->setMTI($currentBank->MTI);
