@@ -4,7 +4,8 @@
 		"Visa":
     {
 			"logo": "Visa_Inc._logo.svg",
-			"url": "localhost",
+			"host": "localhost",
+			"port":"9000",
 			"MTI": "0100",
 			"Field":
       {
