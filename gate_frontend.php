@@ -5,10 +5,6 @@
     <title>Payment Gateway</title>
   </head>
   <body>
-    <?php //if($error != 0)
-    {
-
-    }?>
     <form action="<?php echo $_SERVER['PHP_SELF'];?>" method = "POST" >
       <label for="issuer">Issuer</label>
       <select name="issuer" id="issuer">

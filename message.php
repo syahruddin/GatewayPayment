@@ -1,16 +1,27 @@
 <?php
+  require 'vendor/autoload.php';
+  use ISO8583\Protocol;
+  use ISO8583\Message;
+
   function formToIsoMessage(string $formMessage, string $STAN,string $bank_Config)
   {
+    realtimeDebug("creating message...");
     $bank_Config = json_decode($bank_Config);
     $RRN = createRRN($STAN);
+    realtimeDebug("RRN:$RRN");
     $data = json_decode($formMessage);
-    $currentBank = $bank_Config->Bank->($data->issuer);
+    $issuer = $data->issuer;
+    realtimeDebug("Issuer:$issuer");
+    $currentBank = $bank_Config->Bank->$issuer;
 
     $message = new Message(new Protocol(),['lengthPrefix' => 0]);
-    $message->setMTI($currentBank->MTI);
+    $MTI = $currentBank->MTI;
+    realtimeDebug("MTI:$MTI");
+    $message->setMTI("$MTI");
 
     foreach ($currentBank->Field as $field => $value)
     {
+      realtimeDebug("creating field $field...");
       if($value != null)
       {
         $message->setField($field, "$value");
@@ -27,7 +38,7 @@
             break;
 
           case 7:
-            $UTCdatetime = date_format(date_create(null,timezone_open("UTC")),"mdGis");
+            $UTCdatetime = date_format(date_create(null,timezone_open("UTC")),"mdHis");
             $message->setField(7, "$UTCdatetime"); //transmission date and time format MMDDhhmmss UTC
             break;
 
@@ -36,7 +47,7 @@
             break;
 
           case 12:
-            $localtime = date("Gis");
+            $localtime = date("His");
             $message->setField(12, "$localtime");//time, local transaction
             break;
 
@@ -53,17 +64,23 @@
             $message->setField(37, "$RRN");
             break;
 
+          case 49:
+            $message->setField(49, createTrackOne($formMessage));
+            break;
+
           default:
             break;
         }
       }
     }
-    createMAC($message);
-    $message->pact();
-    return $message;
+  //  realtimeDebug("Creating MAC...");
+  //  createMAC($message);
+    realtimeDebug("Packing Message...");
+    return $message->pack();
+
   }
 
-  function createSTAN()
+  function createSTAN(mysqli $con)
   {
     if($result = $con->query("SELECT SYSTEMTRACEAUDITNUMBER FROM log_pembayaran WHERE tanggal_pembayaran = current_timestamp ORDER BY SYSTEMTRACEAUDITNUMBER DESC;"))
     {
@@ -82,10 +99,10 @@
 
   function createRRN(string $STAN)
   {
-    $date = date(ymd);
+    $date = date("ymd");
     return ($date . $STAN);
   }
-  function searchByRRN(string $RRN)
+  function searchByRRN(string $RRN, mysqli $con)
   {
     if($result = $con->query("SELECT MESSAGE FROM log_pembayaran WHERE RetrivalReferenceNumber = $RRN;"))
     {
@@ -104,25 +121,30 @@
       }
     }
     $hash = hash("sha256",$stringtemp);
+    realtimeDebug("MAC: $hash");
     $message->setField(64, $hash);
   }
-  function addTrackTwo(string $isoMessage, string $firstData, string $secondData)
+  function createTrackOne(string $Data)
   {
-    $firstData = json_decode($firstData);
-    $secondData = json_decode($secondData);
+    $Data = json_decode($Data);
 
-    $message->unpack("$isoMessage");
-    $track_data = $firstData->cnumber; //card number
-    $track_data .= "="; //=
+    $track_data = "B"; //B
+    $track_data .= $Data->cnumber; //card number
+    $track_data .= "^"; //^
+    $track_data .= str_pad($data->owner,26," ",STR_PAD_RIGHT);
     $track_data .= date("my",strtotime($firstData->exp)); //Expired date MMYY
     $track_data .= "220"; //Service Code
-    $track_data .= $secondData->PVV; //PVV
-    $track_data .= $firstData->CVV; //CVV
-    $track_data .= "0"; //trailing 0
-    $message->setField(35, "$track_data");
-    createMAC($message);
-    return $message->pack();
+    $track_data .= "0000"; // 0000
+    $track_data .= $Data->CVV; //CVV
+    $track_data .= "000"; //trailing 000
+
+    return $track_data;
   }
 
+  function realtimeDebug(string $log)
+  {
+    echo "$log\n";
+    flush();
+  }
 
 ?>
