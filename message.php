@@ -1,10 +1,8 @@
 <?php
-  require 'vendor/autoload.php';
-  use ISO8583\Protocol;
-  use ISO8583\Message;
-
   function formToIsoMessage(string $formMessage, string $STAN,string $bank_Config)
   {
+
+
     realtimeDebug("creating message...");
     $bank_Config = json_decode($bank_Config);
     $RRN = createRRN($STAN);
@@ -14,58 +12,60 @@
     realtimeDebug("Issuer:$issuer");
     $currentBank = $bank_Config->Bank->$issuer;
 
-    $message = new Message(new Protocol(),['lengthPrefix' => 0]);
+
+    $message = new RoyISO8583();
     $MTI = $currentBank->MTI;
     realtimeDebug("MTI:$MTI");
-    $message->setMTI("$MTI");
+    $message->setType($MTI);
+
 
     foreach ($currentBank->Field as $field => $value)
     {
       realtimeDebug("creating field $field...");
       if($value != null)
       {
-        $message->setField($field, "$value");
+        $message->addData("$field","$value");
       }
       else
       {
         switch ($field)
         {
           case 2:
-            $message->setField(2, $data->cnumber ); //primary account number
+            $message->addData("$field","$data->cnumber"); //primary account number
             break;
           case 4:
-            $message->setField(4, "000000275000"); //amount transaction 12 digit
+            $message->addData("$field","000000275000"); //amount transaction 12 digit
             break;
 
           case 7:
             $UTCdatetime = date_format(date_create(null,timezone_open("UTC")),"mdHis");
-            $message->setField(7, "$UTCdatetime"); //transmission date and time format MMDDhhmmss UTC
+            $message->addData("$field","$UTCdatetime"); //transmission date and time format MMDDhhmmss UTC
             break;
 
           case 11:
-            $message->setField(11, "$STAN");//system trace audit number
+            $message->addData("$field","$STAN");//system trace audit number
             break;
 
           case 12:
             $localtime = date("His");
-            $message->setField(12, "$localtime");//time, local transaction
+            $message->addData("$field","$localtime");//time, local transaction
             break;
 
           case 13:
             $localdate = date("md");
-            $message->setField(13, "$localdate");//date, local transaction
+            $message->addData("$field","$localdate");//date, local transaction
             break;
 
           case 14:
-            $message->setField(14, date("ym",strtotime($data->exp)));//date, exp
+            $message->addData("$field",date("ym",strtotime($data->exp)));//date, exp
             break;
 
           case 37:
-            $message->setField(37, "$RRN");
+            $message->addData("$field","$RRN"); //RRN
             break;
 
           case 49:
-            $message->setField(49, createTrackOne($formMessage));
+            $message->addData("$field",createTrackOne($formMessage)); //Track1
             break;
 
           default:
@@ -73,10 +73,11 @@
         }
       }
     }
-  //  realtimeDebug("Creating MAC...");
-  //  createMAC($message);
+
+    realtimeDebug("Creating MAC...");
+    createMAC($message);
     realtimeDebug("Packing Message...");
-    return $message->pack();
+    return $message->getISO();
 
   }
 
@@ -110,19 +111,20 @@
     }
     return $message;
   }
-  function createMAC(Message $message)
+  function createMAC(RoyISO8583 $message)
   {
-    $stringtemp = "";
-    foreach($message->getFields() as $key=>$val)
-    {
-      if($key != 64)
-      {
-        $stringtemp .= $val;
-      }
-    }
+//    $stringtemp = "";
+//    foreach($message as $key=>$val)
+//    {
+//      if($key != 64)
+//      {
+//        $stringtemp .= $val;
+//      }
+//    }
+    $stringtemp = $message->getBody();
     $hash = hash("sha256",$stringtemp);
     realtimeDebug("MAC: $hash");
-    $message->setField(64, $hash);
+    $message->addData("64",$hash);
   }
   function createTrackOne(string $Data)
   {

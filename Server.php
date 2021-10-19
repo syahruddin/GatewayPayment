@@ -1,7 +1,6 @@
 <?php
-  require 'vendor/autoload.php';
-  use ISO8583\Protocol;
-  use ISO8583\Message;
+  include "ISO8583-JSON-XML/php-version/lib/RoyISO8583.php";
+
   date_default_timezone_set("Asia/Jakarta");
   $bank_Config = file_get_contents("bank_configuration.json");
   $decoded_bank_Config = json_decode($bank_Config);
@@ -50,6 +49,7 @@
     {
       if(in_array($client,$read))
       {
+
         $input = socket_read($client, 1024) or die("could not read input");
         realtimeDebug("read: $input");
         $decodedInput = json_decode($input);
@@ -67,9 +67,9 @@
         $response = sendMessage($issuer_host,$issuer_port,$isoMessage);
 
         realtimeDebug("Message Received: $response");
-        $response_ISO_message = new Message(new Protocol(),['lengthPrefix' => 0]);
-        $response_ISO_message->unpack("$response");
-        $response_code = $response_ISO_message->getField(39);
+        $response_ISO_message = new RoyISO8583();
+        $response_ISO_message->setISO($response);
+        $response_code = $response_ISO_message->getData()[39];
 
         if($response_code == "00")
         {
@@ -98,13 +98,22 @@
   {
     $socket = socket_create(AF_INET, SOCK_STREAM, 0);
     $result = socket_connect($socket, $host, $port);
-    socket_write($socket, $message, strlen($message));
+
+    socket_write($socket, addHeader($message));
     $out = socket_read($socket,2048);
     socket_close($socket);
     return $out;
   }
+  function addHeader(string $message)
+  {
+    $temp = $message;
+    $temp = mb_strlen($message,'8bit');
+    return $temp;
+  }
+  function removeHeader(string $message)
+  {
 
-
+  }
 
 
 
