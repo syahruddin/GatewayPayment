@@ -64,7 +64,7 @@ class RoyISO8583{
 	61	=> array('ans', 99, 1),
 	62	=> array('ans', 999, 1),
 	63	=> array('ans', 999, 1),
-	64	=> array('b', 16, 0),
+	64	=> array('b', 64, 0),
 	65	=> array('b', 16, 0),
 	66	=> array('n', 1, 0),
 	67	=> array('n', 2, 0),

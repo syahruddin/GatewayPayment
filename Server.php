@@ -99,22 +99,10 @@
     $socket = socket_create(AF_INET, SOCK_STREAM, 0);
     $result = socket_connect($socket, $host, $port);
 
-    socket_write($socket, addHeader($message));
+    socket_write($socket, $message);
     $out = socket_read($socket,2048);
     socket_close($socket);
     return $out;
   }
-  function addHeader(string $message)
-  {
-    $temp = $message;
-    $temp = mb_strlen($message,'8bit');
-    return $temp;
-  }
-  function removeHeader(string $message)
-  {
-
-  }
-
-
 
 ?>
