@@ -1,4 +1,5 @@
 # GatewayPayment
+Menggunakan Library https://github.com/kamshory/ISO8583-JSON-XML
 
 ## Setup
 Memerlukan XAMPP yang terinstal Apache dan Mysql. Memerlukan extension Sockets pada PHP. Buat database "pembayaran" lalu import "pembayaran.sql".
