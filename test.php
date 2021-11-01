@@ -1,6 +1,4 @@
 <?php
-
-
 include "ISO8583-JSON-XML/php-version/lib/RoyISO8583.php";
 error_reporting(E_ALL);
 ob_implicit_flush();
@@ -41,26 +39,27 @@ do
   {
     if(in_array($client,$read))
     {
+      realtimeDebug("===========================================================================");
       $input = socket_read($client, 1024) or die("could not read input");
       realtimeDebug("read: $input");
       $inputIsoMessage = new RoyISO8583();
       $inputIsoMessage->setISO($input);
-
       realtimeDebug("Received Message:");
       printMessage($inputIsoMessage);
 
-      $reply = createreply($inputIsoMessage, $alwaysAccept);
-
+      realtimeDebug("---------------------------------------------------------------------------");
       realtimeDebug("Reply Message:");
+      $reply = createreply($inputIsoMessage, $alwaysAccept);
       printMessage($reply);;
       $isoReply = $reply->getISO();
-      socket_write($client,$isoReply);
 
+
+      socket_write($client,$isoReply);
       unset($clients[$key]);
       socket_close($client);
+      realtimeDebug("===========================================================================");
     }
   }
-
 }while(true);
 
 function printMessage(RoyISO8583 $message)
@@ -91,4 +90,4 @@ function createreply(RoyISO8583 $message, bool $accept)
   return $reply;
 }
 
- ?>
+?>

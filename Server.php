@@ -49,7 +49,7 @@
     {
       if(in_array($client,$read))
       {
-
+        realtimeDebug("===========================================================================");
         $input = socket_read($client, 1024) or die("could not read input");
         realtimeDebug("read: $input");
         $decodedInput = json_decode($input);
@@ -78,6 +78,7 @@
         socket_write($client, $response_code,strlen($response_code));
         unset($clients[$key]);
         socket_close($client);
+        realtimeDebug("===========================================================================");
       }
     }
 
