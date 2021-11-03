@@ -19,7 +19,7 @@
       <label for="exp">EXPIRATION DATE</label><br>
       <input type="month" id="exp" name="exp" required><br><br>
       <label for="cvc">CV CODE</label><br>
-      <input type="number" id="cvc" name="cvc" minlength="3" maxlength="3"required><br><br>
+      <input type="number" id="cvc" name="cvc" minlength="3" maxlength="3" required><br><br>
       <label for="owner">CARD OWNER</label><br>
       <input type="text" id="owner" name="owner" required><br><br>
       <input type="submit" value="Submit">
