@@ -83,12 +83,12 @@
 
   function createSTAN(mysqli $con)
   {
-    if($result = $con->query("SELECT SYSTEMTRACEAUDITNUMBER FROM log_pembayaran WHERE tanggal_pembayaran = current_timestamp ORDER BY SYSTEMTRACEAUDITNUMBER DESC;"))
+    if($result = $con->query("SELECT SystemTraceAuditNumber FROM log_pembayaran WHERE tanggal_pembayaran = CURRENT_DATE ORDER BY SystemTraceAuditNumber DESC;"))
     {
       if($result->num_rows > 0)
       {
         $firstRow = $result->fetch_assoc();
-        return sprinf("%06d", $firstRow['SYSTEMTRACEAUDITNUMBER'] + 1);
+        return sprintf("%06d", $firstRow['SystemTraceAuditNumber'] + 1);
       }
       else
       {
