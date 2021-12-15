@@ -64,7 +64,7 @@
             $message->addData("$field","$RRN"); //RRN
             break;
 
-          case 49:
+          case 45:
             $message->addData("$field",createTrackOne($formMessage)); //Track1
             break;
 
